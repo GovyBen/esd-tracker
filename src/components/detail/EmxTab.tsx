@@ -3,7 +3,7 @@ import { getEmxData, saveEmxData, getAllDiodes, addDiode, type DiodeEntry, type 
 import { getIPById } from "../../db/queries/ip";
 import { generateId } from "../../lib/uuid";
 import { getAllTechnologies } from "../../db/queries/technology";
-import { Save, Plus, Trash2, Zap, Radio, Shield } from "lucide-react";
+import { Save, Plus, Trash2, Zap, Radio, Shield, Check, X } from "lucide-react";
 
 const P2P_PRESETS_KEY = "esd-p2p-presets";
 const CLAMP_PRESETS_KEY = "esd-clamp-presets";
@@ -152,16 +152,30 @@ function P2PSection({ items, onChange }: { items: P2PEntry[]; onChange: (d: P2PE
   const [newName, setNewName] = useState("");
   const [newValue, setNewValue] = useState("");
   const [showPresets, setShowPresets] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editValue, setEditValue] = useState('');
 
   const addItem = () => { if (newName.trim()) { onChange([...items, { id: generateId(), name: newName.trim(), value: newValue.trim() || "-" }]); setNewName(""); setNewValue(""); } };
   const addPreset = (p: typeof presets[0]) => { onChange([...items, { id: generateId(), name: p.name, value: p.value }]); };
+  const startEdit = (item: P2PEntry) => { setEditId(item.id); setEditName(item.name); setEditValue(item.value); };
+  const saveEdit = () => { onChange(items.map((i) => i.id === editId ? { ...i, name: editName, value: editValue } : i)); setEditId(null); };
 
   return (
     <div className="space-y-2">
       {items.map((item) => (
         <div key={item.id} className="flex items-center justify-between text-xs bg-gray-50 px-2 py-1 rounded">
-          <span><span className="text-gray-700 font-mono">{item.name}</span><span className="text-gray-400 ml-2">{item.value}</span></span>
-          <button onClick={() => onChange(items.filter((i) => i.id !== item.id))} className="text-gray-400 hover:text-red-500"><Trash2 size={12} /></button>
+          {editId === item.id ? (
+            <div className="flex items-center gap-1 flex-1">
+              <input value={editName} onChange={(e) => setEditName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && saveEdit()} className="border rounded px-1 py-0.5 text-xs w-28 font-mono" autoFocus />
+              <input value={editValue} onChange={(e) => setEditValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && saveEdit()} className="border rounded px-1 py-0.5 text-xs w-16" />
+              <button onClick={saveEdit} className="text-green-500"><Check size={12} /></button>
+              <button onClick={() => setEditId(null)} className="text-gray-400"><X size={12} /></button>
+            </div>
+          ) : (
+            <span className="cursor-pointer hover:text-blue-600" onClick={() => startEdit(item)}><span className="text-gray-700 font-mono">{item.name}</span><span className="text-gray-400 ml-2">{item.value}</span></span>
+          )}
+          <button onClick={() => onChange(items.filter((i) => i.id !== item.id))} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 size={12} /></button>
         </div>
       ))}
       <div className="flex gap-1">
@@ -194,6 +208,9 @@ function ClampSection({ items, onChange }: { items: ClampEntry[]; onChange: (d: 
   const [newModel, setNewModel] = useState("");
   const [hasParasitic, setHasParasitic] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editValue, setEditValue] = useState('');
 
   let filteredPresets = presets;
   if (filterSameTech) filteredPresets = presets.filter((p) => p.technologyName === "N5");
