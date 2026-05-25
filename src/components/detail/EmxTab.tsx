@@ -25,6 +25,8 @@ export function EmxTab({ portId }: EmxTabProps) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => { const d = getEmxData(portId); setDiodes(d.appliedDiodes); setP2pItems(d.p2pItems); setClampItems(d.clampItems); setNotes(d.notes); }, [portId]);
+  // Auto-save on any change
+  useEffect(() => { saveEmxData(portId, { appliedDiodes: diodes, p2pItems, clampItems, notes }); }, [diodes, p2pItems, clampItems, notes, portId]);
 
   const handleSave = () => {
     saveEmxData(portId, { appliedDiodes: diodes, p2pItems, clampItems, notes });

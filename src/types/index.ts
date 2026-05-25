@@ -64,6 +64,7 @@ export interface IPBlockRecord {
   extensions: { date: string; reason: string }[];
   status: string;
   isDemo: boolean;
+  assignments: { roleId: string; personId: string }[];
   technologyId: string | null;
   startDate: string | null;
   ddlDate: string | null;

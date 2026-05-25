@@ -141,12 +141,14 @@ function ExtensionSection({ ipId, extensions, onUpdate }: { ipId: string; extens
 
 function AssigneeEditor({ ipId }: { ipId: string }) {
   const roles = getAllRoles(); const persons = getAllPersons();
-  const [entries, setEntries] = useState<{ roleId: string; personId: string }[]>([]);
+  const ip = getIPById(ipId);
+  const [entries, setEntries] = useState<{ roleId: string; personId: string }[]>(ip?.assignments || []);
   const [selRole, setSelRole] = useState(""); const [selPerson, setSelPerson] = useState("");
-  const add = () => { if (!selRole || !selPerson) return; setEntries([...entries, { roleId: selRole, personId: selPerson }]); setSelRole(""); setSelPerson(""); };
+  const add = () => { if (!selRole || !selPerson) return; const next = [...entries, { roleId: selRole, personId: selPerson }]; setEntries(next); updateIP(ipId, { assignments: next }); setSelRole(""); setSelPerson(""); };
+  const remove = (roleId: string, idx: number) => { const next = entries.filter((_: any, i: number) => i !== idx); setEntries(next); updateIP(ipId, { assignments: next }); };
   return (
     <div className="space-y-2">
-      {entries.map((e) => { const r = roles.find((x) => x.id === e.roleId); const p = persons.find((x) => x.id === e.personId); return (<div key={e.roleId} className="flex items-center justify-between text-sm bg-gray-50 px-2 py-1 rounded"><span><span className="text-gray-400">{r?.name}: </span><span className="text-gray-700">{p?.name}</span></span><button onClick={() => setEntries(entries.filter((x) => x.roleId !== e.roleId))} className="text-gray-400 hover:text-red-500"><X size={14} /></button></div>); })}
+      {entries.map((e, idx) => { const r = roles.find((x) => x.id === e.roleId); const p = persons.find((x) => x.id === e.personId); return (<div key={e.roleId} className="flex items-center justify-between text-sm bg-gray-50 px-2 py-1 rounded"><span><span className="text-gray-400">{r?.name}: </span><span className="text-gray-700">{p?.name}</span></span><button onClick={() => remove(e.roleId, idx)} className="text-gray-400 hover:text-red-500"><X size={14} /></button></div>); })}
       <div className="flex gap-2 items-center">
         <select value={selRole} onChange={(e) => setSelRole(e.target.value)} className="border rounded px-2 py-1 text-xs flex-1"><option value="">角色...</option>{roles.map((r) => (<option key={r.id} value={r.id}>{r.name}</option>))}</select>
         <select value={selPerson} onChange={(e) => setSelPerson(e.target.value)} className="border rounded px-2 py-1 text-xs flex-1"><option value="">人员...</option>{persons.map((p) => (<option key={p.id} value={p.id}>{p.name}</option>))}</select>

@@ -60,15 +60,18 @@ export function SettingsPage() {
   const [showDemo, setShowDemo] = useState(() => localStorage.getItem('esd-show-demo') !== '0');
 
   useEffect(() => { const db = getDB(); setDbInfo({ ips: db.ipBlocks.length, ports: db.ports.length }); }, []);
+  // Auto-save P2P/CLAMP/diode models on change
+  useEffect(() => { saveJSON(P2P_PRESETS_KEY, p2pPresets); }, [p2pPresets]);
+  useEffect(() => { saveJSON(CLAMP_PRESETS_KEY, clampPresets); }, [clampPresets]);
+  useEffect(() => { saveJSON(DIODE_MODELS_KEY, diodeModels); }, [diodeModels]);
+  useEffect(() => { saveJSON(FILTER_SAME_TECH_KEY, filterSameTech); }, [filterSameTech]);
+  useEffect(() => { saveMilestonePresets(presets); }, [presets]);
 
   const handleSaveUser = () => { setCurrentUser(name.trim()); setSaved(true); setTimeout(() => setSaved(false), 2000); };
   const handleSaveAll = () => {
-    saveMilestonePresets(presets);
-    saveJSON(P2P_PRESETS_KEY, p2pPresets);
-    saveJSON(CLAMP_PRESETS_KEY, clampPresets);
-    saveJSON(DIODE_MODELS_KEY, diodeModels);
-    saveJSON(FILTER_SAME_TECH_KEY, filterSameTech);
+    saveMilestonePresets(presets); saveJSON(P2P_PRESETS_KEY, p2pPresets); saveJSON(CLAMP_PRESETS_KEY, clampPresets); saveJSON(DIODE_MODELS_KEY, diodeModels); saveJSON(FILTER_SAME_TECH_KEY, filterSameTech);
   };
+
 
   const handleResetDB = () => {
     if (!resetConfirm) { setResetConfirm(true); return; }
@@ -130,9 +133,7 @@ export function SettingsPage() {
               {p.milestones.map((m, i) => (
                 <div key={i} className="flex items-center gap-2 ml-4">
                   <span className="text-xs text-gray-400 w-5">{i + 1}.</span>
-                  <input value={m.title} onChange={(e) => {
-                    setPresets(presets.map((x) => x.id !== p.id ? x : { ...x, milestones: x.milestones.map((ms, j) => j === i ? { ...ms, title: e.target.value } : ms) }));
-                  }} className="flex-1 text-xs border border-gray-100 rounded px-2 py-0.5 outline-none focus:border-blue-300" />
+                  <input value={m.title} onChange={(e) => { const v = e.target.value; setPresets(prev => prev.map((x: any) => x.id !== p.id ? x : { ...x, milestones: x.milestones.map((ms: any, j: number) => j === i ? { ...ms, title: v } : ms) })); }} className="flex-1 text-xs border border-gray-100 rounded px-2 py-0.5 outline-none focus:border-blue-300" />
                 </div>
               ))}
               <button onClick={() => setPresets(presets.map((x) => x.id !== p.id ? x : { ...x, milestones: [...x.milestones, { title: "新阶段", order: x.milestones.length }] }))}

@@ -11,7 +11,7 @@ export function createIP(data: Partial<IPBlockRecord>): IPBlockRecord {
   const ip: IPBlockRecord = {
     id: generateId(), name: data.name || "New IP", technologyId: data.technologyId ?? null,
     startDate: data.startDate ?? null, ddlDate: data.ddlDate ?? null,
-    notes: data.notes ?? null, chipTagIds: data.chipTagIds || [], extendedDdlDate: data.extendedDdlDate ?? null, extensions: data.extensions || [], status: data.status || "pending", isDemo: data.isDemo || false,
+    notes: data.notes ?? null, chipTagIds: data.chipTagIds || [], extendedDdlDate: data.extendedDdlDate ?? null, extensions: data.extensions || [], status: data.status || "pending", isDemo: data.isDemo || false, assignments: data.assignments || [],
     createdAt: now, updatedAt: now,
   };
   db.ipBlocks.push(ip); saveDB(); return ip;

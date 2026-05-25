@@ -33,18 +33,31 @@ export function PortDetail({ portId }: PortDetailProps) {
         </div>
       </div>
 
-      {/* Standard tags */}
       {(cdmStd || hbmStd) && (
-        <div className="flex flex-wrap gap-2">
-          {cdmStd && <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">CDM: {cdmStd.name}</span>}
-          {hbmStd && <span className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full">HBM: {hbmStd.name}</span>}
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {cdmStd && <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">CDM: {cdmStd.name}</span>}
+            {hbmStd && <span className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full">HBM: {hbmStd.name}</span>}
+          </div>
+          {cdmStd?.params && Object.keys(cdmStd.params).length > 0 && (
+            <div className="text-xs text-gray-500 bg-gray-50 rounded p-2">
+              <span className="font-medium text-amber-600">CDM: </span>
+              {Object.entries(cdmStd.params).map(([k, v]) => `${k}=${v}`).join(", ")}
+            </div>
+          )}
+          {hbmStd?.params && Object.keys(hbmStd.params).length > 0 && (
+            <div className="text-xs text-gray-500 bg-gray-50 rounded p-2">
+              <span className="font-medium text-indigo-600">HBM: </span>
+              {Object.entries(hbmStd.params).map(([k, v]) => `${k}=${v}`).join(", ")}
+            </div>
+          )}
         </div>
       )}
 
       <div className="flex border-b border-gray-200">
         {tabs.map((tab) => (
           <button key={tab.id} onClick={() => setPortTab(tab.id)}
-            className={`px-4 py-2 text-sm border-b-2 transition-colors -mb-px ${portTab === tab.id ? "border-blue-500 text-blue-600 font-medium" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
+            className={"px-4 py-2 text-sm border-b-2 transition-colors -mb-px " + (portTab === tab.id ? "border-blue-500 text-blue-600 font-medium" : "border-transparent text-gray-500 hover:text-gray-700")}>
             {tab.label}
           </button>
         ))}
